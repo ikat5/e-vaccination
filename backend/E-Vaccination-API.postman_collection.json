@@ -1,0 +1,482 @@
+{
+	"info": {
+		"name": "E-Vaccination API",
+		"description": "Complete API collection for E-Vaccination Backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "userToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "adminToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "staffToken",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "User APIs",
+			"item": [
+				{
+					"name": "User Signup",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\",\n  \"phoneNumber\": \"+1234567890\",\n  \"dateOfBirth\": \"1990-01-15\",\n  \"fatherName\": \"John Senior\",\n  \"motherName\": \"Jane Doe\",\n  \"gender\": \"Male\",\n  \"BirthId\": \"BD123456789\",\n  \"nationalId\": \"NID123456\",\n  \"address\": {\n    \"houseOrHoldingNo\": \"123\",\n    \"villageOrNeighborhood\": \"Main Street\",\n    \"upazilaOrMunicipality\": \"Dhaka\",\n    \"districtOrCityCorporation\": \"Dhaka\",\n    \"unionOrZone\": \"Zone 1\",\n    \"wardNo\": \"5\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/user/signup",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "user", "signup"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.accessToken) {",
+									"        pm.collectionVariables.set(\"userToken\", jsonData.data.accessToken);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/user/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "user", "login"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{userToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/user/logout",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "user", "logout"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin APIs",
+			"item": [
+				{
+					"name": "Admin Signup",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"phone_number\": \"+1234567891\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/signup",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "signup"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.accessToken) {",
+									"        pm.collectionVariables.set(\"adminToken\", jsonData.data.accessToken);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "login"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/logout",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "logout"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Staff",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Staff Member\",\n  \"phone_number\": \"+1234567892\",\n  \"email\": \"staff@example.com\",\n  \"password\": \"staff123\",\n  \"address\": \"123 Staff Street\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/create-staff",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "create-staff"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Vaccine Stock",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"vaccine_name\": \"BCG\",\n  \"quantity\": 100\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/update-stock",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "update-stock"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Vaccine to Staff",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{adminToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"staffId\": \"STAFF_ID_HERE\",\n  \"vaccine_name\": \"BCG\",\n  \"quantity\": 50\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/assign-vaccine",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "admin", "assign-vaccine"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Staff APIs",
+			"item": [
+				{
+					"name": "Staff Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.accessToken) {",
+									"        pm.collectionVariables.set(\"staffToken\", jsonData.data.accessToken);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"staff@example.com\",\n  \"password\": \"staff123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/staff/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "staff", "login"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Staff Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staffToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/staff/logout",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "staff", "logout"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Assigned Vaccine",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staffToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/staff/assigned",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "staff", "assigned"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Remaining Quantity",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staffToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"newQuantity\": 45\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/staff/update-quantity",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "staff", "update-quantity"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Administer Vaccine",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staffToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"birthId\": \"BD123456789\",\n  \"vaccine_name\": \"BCG\",\n  \"date_taken\": \"2024-01-15\",\n  \"place\": \"Health Center A\",\n  \"next_dose_date\": \"2024-02-15\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/staff/administer",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "staff", "administer"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Staff Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staffToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/staff/stats",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "staff", "stats"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Vaccine APIs",
+			"item": [
+				{
+					"name": "Schedule First Dose",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{userToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"birthId\": \"BD123456789\",\n  \"vaccine_name\": \"BCG\",\n  \"date_taken\": \"2024-01-15\",\n  \"place\": \"Health Center A\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/vaccine/first-dose",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "vaccine", "first-dose"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Schedule Next Dose",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{userToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"birthId\": \"BD123456789\",\n  \"vaccine_name\": \"BCG\",\n  \"next_dose_date\": \"2024-02-15\",\n  \"place\": \"Health Center A\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/vaccine/next-dose",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "vaccine", "next-dose"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
+

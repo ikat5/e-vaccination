@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Vaccination Admin Dashboard</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #4ECDC4;
+            --secondary-color: #FF6B6B;
+            --success-color: #51CF66;
+            --warning-color: #FFD93D;
+            --dark-color: #2C3E50;
+            --light-bg: #F8F9FA;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .stat-card {
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            border: none;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .stat-card-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+        .stat-card-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
+        .stat-card-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-icon {
+            font-size: 3rem;
+            opacity: 0.3;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+        }
+        
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .insight-card {
+            border-left: 4px solid;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background: white;
+        }
+        
+        .insight-warning { border-left-color: #ff6b6b; background: #fff5f5; }
+        .insight-info { border-left-color: #4dabf7; background: #f0f7ff; }
+        .insight-success { border-left-color: #51cf66; background: #f4fff4; }
+        .insight-alert { border-left-color: #ffd93d; background: #fffbef; }
+        
+        .table-wrapper {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-delivered { background: #d3f9d8; color: #2b8a3e; }
+        .status-transit { background: #d0ebff; color: #1971c2; }
+        .status-delayed { background: #ffe8cc; color: #e8590c; }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">
+                <i class="fas fa-syringe me-2"></i>
+                E-Tika Admin Dashboard - Bangladesh
+            </span>
+            <span class="text-white">
+                <i class="fas fa-user-shield me-2"></i>
+                স্বাস্থ্য মন্ত্রণালয় | Admin Panel
+            </span>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- Overview Stats -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-card stat-card-1 position-relative">
+                    <i class="fas fa-box-open stat-icon"></i>
+                    <div class="stat-label">Total Vaccines Supplied</div>
+                    <div class="stat-value" id="totalVaccines">--</div>
+                    <small><i class="fas fa-arrow-up me-1"></i>All hubs combined</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card stat-card-2 position-relative">
+                    <i class="fas fa-syringe stat-icon"></i>
+                    <div class="stat-label">Total Administered</div>
+                    <div class="stat-value" id="totalAdministered">--</div>
+                    <small><i class="fas fa-check me-1"></i>Citizens vaccinated</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card stat-card-3 position-relative">
+                    <i class="fas fa-trash-alt stat-icon"></i>
+                    <div class="stat-label">Wastage Rate</div>
+                    <div class="stat-value" id="wastageRate">--</div>
+                    <small><i class="fas fa-exclamation-triangle me-1"></i>Needs monitoring</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card stat-card-4 position-relative">
+                    <i class="fas fa-warehouse stat-icon"></i>
+                    <div class="stat-label">Active Hubs</div>
+                    <div class="stat-value" id="activeHubs">--</div>
+                    <small><i class="fas fa-building me-1"></i>Operational centers</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-lg-8">
+                <!-- Vaccine Movement Tracking -->
+                <div class="section-card">
+                    <h3 class="section-title">
+                        <i class="fas fa-truck me-2"></i>
+                        Vaccine Movement Tracking
+                    </h3>
+                    
+                    <div class="filter-section">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <select class="form-select form-select-sm" id="statusFilter">
+                                    <option value="">All Status</option>
+                                    <option value="Delivered">Delivered</option>
+                                    <option value="In_Transit">In Transit</option>
+                                    <option value="Delayed">Delayed</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="date" class="form-control form-control-sm" id="startDate" placeholder="Start Date">
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-sm btn-primary w-100" onclick="loadMovements()">
+                                    <i class="fas fa-filter me-1"></i>Apply Filter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-wrapper">
+                        <table class="table table-hover" id="movementsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Transfer ID</th>
+                                    <th>From Hub</th>
+                                    <th>To Hub</th>
+                                    <th>Vaccine</th>
+                                    <th>Quantity</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="movementsBody">
+                                <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Data Visualizations -->
+                <div class="section-card">
+                    <h3 class="section-title">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Data Visualizations
+                    </h3>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-center mb-3">Coverage by Division (বিভাগ)</h5>
+                            <div class="chart-container">
+                                <canvas id="coverageChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-center mb-3">Age Group Distribution (বয়স)</h5>
+                            <div class="chart-container">
+                                <canvas id="ageChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-center mb-3">Wastage Reasons</h5>
+                            <div class="chart-container">
+                                <canvas id="wastageReasonChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-center mb-3">Vaccination Trend</h5>
+                            <div class="chart-container">
+                                <canvas id="trendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-lg-4">
+                <!-- Smart Insights -->
+                <div class="section-card">
+                    <h3 class="section-title">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Smart Insights
+                    </h3>
+                    <div id="insightsContainer">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p class="mt-3">Loading insights...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Wastage Prediction -->
+                <div class="section-card">
+                    <h3 class="section-title">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Wastage Prediction (Next 7 Days)
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="predictionChart"></canvas>
+                    </div>
+                    <div class="text-center mt-3">
+                        <button class="btn btn-primary btn-sm" onclick="loadPrediction()">
+                            <i class="fas fa-sync-alt me-1"></i>
+                            Refresh Prediction
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let charts = {};
+        let backendAvailable = false;
+
+        // Check if backend is available
+        async function checkBackend() {
+            try {
+                const response = await fetch('http://localhost:5000/', { timeout: 2000 });
+                backendAvailable = response.ok;
+                return backendAvailable;
+            } catch (error) {
+                backendAvailable = false;
+                return false;
+            }
+        }
+
+        // Show error message
+        function showBackendError() {
+            const errorMsg = `
+                <div style="text-align: center; padding: 50px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: #ff6b6b;"></i>
+                    <h3 style="color: #2c3e50; margin-top: 20px;">Backend Server Not Running</h3>
+                    <p style="color: #666;">Please start the Flask backend server to view the dashboard.</p>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px auto; max-width: 600px; text-align: left;">
+                        <strong>Steps to fix:</strong>
+                        <ol style="line-height: 2;">
+                            <li>Open a terminal</li>
+                            <li>Navigate to: <code>/home/stoic/Desktop/e-vaccination/ml/backend</code></li>
+                            <li>Run: <code style="background: #fff; padding: 3px 8px; border-radius: 4px;">python3 app.py</code></li>
+                            <li>Wait for "Running on http://localhost:5000"</li>
+                            <li>Refresh this page</li>
+                        </ol>
+                        <strong>Or install dependencies first:</strong>
+                        <pre style="background: #2c3e50; color: #fff; padding: 10px; border-radius: 5px; margin-top: 10px;">pip3 install flask flask-cors pandas numpy</pre>
+                    </div>
+                    <button class="btn btn-primary mt-3" onclick="location.reload()">
+                        <i class="fas fa-sync-alt me-2"></i>Retry Connection
+                    </button>
+                </div>
+            `;
+            document.querySelector('.container-fluid').innerHTML = errorMsg;
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check backend first
+            const isAvailable = await checkBackend();
+            
+            if (!isAvailable) {
+                showBackendError();
+                return;
+            }
+
+            // Backend is available, load data
+            loadOverview();
+            loadMovements();
+            loadInsights();
+            loadCoverage();
+            loadDemographics();
+            loadWastageStats();
+            loadPrediction();
+        });
+
+        // Load overview statistics
+        async function loadOverview() {
+            try {
+                const response = await fetch(`${API_BASE}/overview`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    document.getElementById('totalVaccines').textContent = 
+                        data.data.total_vaccines_supplied.toLocaleString();
+                    document.getElementById('totalAdministered').textContent = 
+                        data.data.total_administered.toLocaleString();
+                    document.getElementById('wastageRate').textContent = 
+                        data.data.wastage_rate.toFixed(2) + '%';
+                    document.getElementById('activeHubs').textContent = 
+                        data.data.active_hubs + '/' + data.data.total_hubs;
+                }
+            } catch (error) {
+                console.error('Error loading overview:', error);
+            }
+        }
+
+        // Load vaccine movements
+        function formatStatusBadge(status) {
+            const statusClass =
+                status === 'Delivered' ? 'status-delivered' :
+                status === 'In_Transit' ? 'status-transit' : 'status-delayed';
+            return `<span class="status-badge ${statusClass}">${status.replace('_', ' ')}</span>`;
+        }
+
+        function renderMovementsRows(tbody, movements, note = '') {
+            tbody.innerHTML = '';
+            movements.slice(0, 20).forEach(movement => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><small>${movement.transfer_id}</small></td>
+                        <td><small>${movement.from_hub_name}</small></td>
+                        <td><small>${movement.to_hub_name}</small></td>
+                        <td><small>${movement.vaccine_name}</small></td>
+                        <td>${movement.quantity_transferred}</td>
+                        <td>${formatStatusBadge(movement.status)}</td>
+                        <td><small>${movement.transfer_date}</small></td>
+                    </tr>
+                `;
+            });
+
+            if (movements.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No transfers match the selected filters.</td></tr>';
+            } else if (note) {
+                tbody.innerHTML += `<tr><td colspan="7" class="text-center text-muted">${note}</td></tr>`;
+            }
+        }
+
+        async function loadMovementsFallback(tbody) {
+            try {
+                const response = await fetch('../data/vaccine_movements.csv');
+                if (!response.ok) throw new Error(`Fallback CSV request failed with status ${response.status}`);
+
+                const text = await response.text();
+                const lines = text.trim().split('\n');
+                const headers = lines.shift().split(',');
+                const movements = lines.map(line => {
+                    const values = line.split(',');
+                    const record = {};
+                    headers.forEach((header, index) => {
+                        record[header] = values[index];
+                    });
+                    return {
+                        transfer_id: record.transfer_id,
+                        from_hub_name: record.from_hub_name,
+                        to_hub_name: record.to_hub_name,
+                        vaccine_name: record.vaccine_name,
+                        quantity_transferred: record.quantity_transferred,
+                        status: record.status,
+                        transfer_date: record.transfer_date
+                    };
+                });
+
+                renderMovementsRows(tbody, movements, 'Loaded from local dataset (offline mode).');
+            } catch (fallbackError) {
+                console.error('Fallback loading failed:', fallbackError);
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Unable to load transfer data.</td></tr>';
+            }
+        }
+
+        async function loadMovements() {
+            try {
+                const status = document.getElementById('statusFilter').value;
+                const startDate = document.getElementById('startDate').value;
+                
+                let url = `${API_BASE}/movements?`;
+                if (status) url += `status=${status}&`;
+                if (startDate) url += `start_date=${startDate}`;
+                
+                const tbody = document.getElementById('movementsBody');
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">Loading transfers...</td></tr>';
+
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`Request failed with status ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    renderMovementsRows(tbody, data.data.movements);
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Failed to load transfers from API.</td></tr>';
+                    await loadMovementsFallback(tbody);
+                }
+            } catch (error) {
+                console.error('Error loading movements:', error);
+                const tbody = document.getElementById('movementsBody');
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-warning">Trying offline dataset...</td></tr>';
+                await loadMovementsFallback(tbody);
+            }
+        }
+
+        // Load insights
+        async function loadInsights() {
+            try {
+                const response = await fetch(`${API_BASE}/insights`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const container = document.getElementById('insightsContainer');
+                    container.innerHTML = '';
+                    
+                    data.data.insights.forEach(insight => {
+                        container.innerHTML += `
+                            <div class="insight-card insight-${insight.type}">
+                                <h6><i class="fas fa-circle me-2" style="font-size: 0.5rem;"></i>${insight.title}</h6>
+                                <p class="mb-2"><small>${insight.message}</small></p>
+                                <small><strong>Recommendation:</strong> ${insight.recommendation}</small>
+                            </div>
+                        `;
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading insights:', error);
+            }
+        }
+
+        // Load coverage data and chart
+        async function loadCoverage() {
+            try {
+                const response = await fetch(`${API_BASE}/coverage`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    // Coverage by division chart
+                    const divisions = data.data.by_division;
+                    const ctx = document.getElementById('coverageChart').getContext('2d');
+                    
+                    charts.coverage = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: divisions.map(d => d.division),
+                            datasets: [{
+                                label: 'Coverage %',
+                                data: divisions.map(d => d.coverage_percentage),
+                                backgroundColor: 'rgba(78, 205, 196, 0.8)',
+                                borderColor: 'rgba(78, 205, 196, 1)',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 100
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Vaccination trend
+                    const trend = data.data.vaccination_trend.slice(-30);
+                    const ctx2 = document.getElementById('trendChart').getContext('2d');
+                    
+                    charts.trend = new Chart(ctx2, {
+                        type: 'line',
+                        data: {
+                            labels: trend.map(t => new Date(t.vaccination_date).toLocaleDateString()),
+                            datasets: [{
+                                label: 'Daily Vaccinations',
+                                data: trend.map(t => t.count),
+                                borderColor: 'rgba(102, 126, 234, 1)',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading coverage:', error);
+            }
+        }
+
+        // Load demographics
+        async function loadDemographics() {
+            try {
+                const response = await fetch(`${API_BASE}/demographics`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const ageGroups = data.data.age_groups;
+                    const ctx = document.getElementById('ageChart').getContext('2d');
+                    
+                    charts.age = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: Object.keys(ageGroups),
+                            datasets: [{
+                                data: Object.values(ageGroups),
+                                backgroundColor: [
+                                    'rgba(255, 107, 107, 0.8)',
+                                    'rgba(78, 205, 196, 0.8)',
+                                    'rgba(69, 183, 209, 0.8)',
+                                    'rgba(255, 217, 61, 0.8)'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading demographics:', error);
+            }
+        }
+
+        // Load wastage statistics
+        async function loadWastageStats() {
+            try {
+                const response = await fetch(`${API_BASE}/wastage/stats`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const reasons = data.data.by_reason;
+                    const ctx = document.getElementById('wastageReasonChart').getContext('2d');
+                    
+                    charts.wastageReason = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(reasons).map(r => r.replace('_', ' ')),
+                            datasets: [{
+                                data: Object.values(reasons),
+                                backgroundColor: [
+                                    'rgba(255, 107, 107, 0.8)',
+                                    'rgba(78, 205, 196, 0.8)',
+                                    'rgba(69, 183, 209, 0.8)',
+                                    'rgba(255, 217, 61, 0.8)',
+                                    'rgba(149, 225, 211, 0.8)'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading wastage stats:', error);
+            }
+        }
+
+        // Load wastage prediction
+        async function loadPrediction() {
+            try {
+                const response = await fetch(`${API_BASE}/wastage/predict`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const predictions = data.data.predictions;
+                    const ctx = document.getElementById('predictionChart').getContext('2d');
+                    
+                    if (charts.prediction) {
+                        charts.prediction.destroy();
+                    }
+                    
+                    charts.prediction = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: predictions.map(p => new Date(p.date).toLocaleDateString()),
+                            datasets: [{
+                                label: 'Predicted Wastage Rate %',
+                                data: predictions.map(p => p.predicted_wastage_rate),
+                                borderColor: 'rgba(255, 107, 107, 1)',
+                                backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                borderWidth: 3
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    const container = document.querySelector('#predictionChart').parentElement;
+                    container.innerHTML = '<div class="text-danger text-center">Failed to load prediction</div>';
+                }
+            } catch (error) {
+                console.error('Error loading prediction:', error);
+                const container = document.querySelector('#predictionChart').parentElement;
+                container.innerHTML = '<div class="text-danger text-center">Error loading prediction</div>';
+            }
+        }
+    </script>
+</body>
+</html>
